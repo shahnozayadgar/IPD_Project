@@ -5,6 +5,31 @@ import utime
 buzzer_pin = machine.Pin(16)
 buzzer = machine.PWM(buzzer_pin)
 
+#LED GPIO Pins
+led_red = machine.Pin(15, machine.Pin.OUT)
+led_blue = machine.Pin(14, machine.Pin.OUT)
+led_yellow = machine.Pin(13, machine.Pin.OUT)
+led_green = machine.Pin(12, machine.Pin.OUT)
+led_orange = machine.Pin(11, machine.Pin.OUT)
+led_purple = machine.Pin(10, machine.Pin.OUT)
+led_pink = machine.Pin(9, machine.Pin.OUT)
+led_black = machine.Pin(8, machine.Pin.OUT)
+led_white = machine.Pin(7, machine.Pin.OUT)
+
+#helper function to turn off all LEDs before/after playing a color melody
+def turn_off_all_leds():
+    led_red.off()
+    led_blue.off()
+    led_yellow.off()
+    led_green.off()
+    led_orange.off()
+    led_purple.off()
+    led_pink.off()
+    led_black.off()
+    led_white.off()
+
+
+
 # we can adjust to make the sound louder or softer
 volume = 30000
 
@@ -24,6 +49,10 @@ def play_red():
     """
     RED (#FF0000): Joyful, bright, energetic “bell chimes.”
     """
+
+    # LED on
+    led_red.on()
+
     melody = [
         1000, 1200, 1400, 1600,  # up
         1400, 1200, 1000,        # down
@@ -38,11 +67,16 @@ def play_red():
     ]
     for freq, dur in zip(melody, durations):
         play_tone(freq, dur)
+    
+    # LED off
+    led_red.off()
 
 def play_blue():
     """
     BLUE (#0000FF): Calm “ocean wave” pattern at a lower pitch.
     """
+    # LED on
+    led_blue.on()
 
     wave_sequence = [
         (200, 0.3), (250, 0.3), (300, 0.3), (350, 0.3),
@@ -52,11 +86,17 @@ def play_blue():
     for _ in range(2):
         for freq, dur in wave_sequence:
             play_tone(freq, dur)
+    
+    # LED off
+    led_blue.off()
 
 def play_yellow():
     """
     YELLOW (#FFFF00): Bright, happy “bird chirps.”
     """
+    # LED on
+    led_yellow.on()
+
     melody = [
         1500, 1800, 1500, 1800,  
         2000, 1700, 2000,        # up-down
@@ -72,11 +112,16 @@ def play_yellow():
     ]
     for freq, dur in zip(melody, durations):
         play_tone(freq, dur)
+    
+    # LED off
+    led_yellow.off()
 
 def play_green():
     """
     GREEN (#008000): Natural, friendly frog-like or leaf-rustling feel.
     """
+    # LED on
+    led_green.on()
 
     sequence_one = [
         (400, 0.2), (450, 0.2), (400, 0.2), (350, 0.2)
@@ -91,11 +136,16 @@ def play_green():
     for _ in range(2):
         for freq, dur in sequence_two:
             play_tone(freq, dur)
+    
+    # LED off
+    led_green.off()
 
 def play_orange():
     """
     ORANGE (#FFA500): Warm, energetic trumpet or fanfare style.
     """
+    # LED on
+    led_orange.on()
 
     fanfare = [
         (800, 0.15), (1200, 0.15), (1000, 0.15),
@@ -111,12 +161,17 @@ def play_orange():
     # end with flourish
     for freq, dur in flourish:
         play_tone(freq, dur)
-
-
+    
+    # LED off
+    led_orange.off()
+    
 def play_purple():
     """
     PURPLE (#800080): Magical sparkle or whimsical notes (mysterious, imaginative).
     """
+    # LED on
+    led_purple.on()
+
     melody = [
         1200, 1400, 1600, 1800,  # up
         1600, 1400, 1200,        # down
@@ -131,11 +186,17 @@ def play_purple():
     ]
     for freq, dur in zip(melody, durations):
         play_tone(freq, dur)
+    
+    # LED off
+    led_purple.off()
 
 def play_pink():
     """
     PINK (#FFC0CB): Light-hearted 'bubble-popping' or gentle bell sounds.
     """
+    # LED on
+    led_pink.on()
+
     melody = [
         1500, 1800, 1600, 2000, 
         2200, 1800, 1400, 1800,  
@@ -148,11 +209,16 @@ def play_pink():
     ]
     for freq, dur in zip(melody, durations):
         play_tone(freq, dur)
+    
+    # LED off
+    led_pink.off()
 
 def play_black():
     """
     BLACK (#000000): Cozy nighttime with gentle 'heartbeat' and 'cricket chirp.'
     """
+    # LED on
+    led_black.on()
 
     for _ in range(4):
         play_tone(200, 0.2)
@@ -164,10 +230,16 @@ def play_black():
         play_tone(freq, 0.05)
         utime.sleep(0.3)
 
+    # LED off
+    led_black.off()
+
 def play_white():
     """
     WHITE (#FFFFFF): Gentle wind-chime or soft 'fairy dust' twinkle (airy, clean).
     """
+    # LED on
+    led_white.on()
+
     melody = [
         1200, 1400, 1600, 1800, 2000,
         1800, 1600, 2200, 2000, 2400,
@@ -180,9 +252,17 @@ def play_white():
     ]
     for freq, dur in zip(melody, durations):
         play_tone(freq, dur)
+    
+    # LED off
+    led_white.off()
 
 #Todo: Implement NFC tag to distinguish each color
 while True:
+
+    # Turn off all LEDs before playing a new color
+    turn_off_all_leds()
+
+    
     print("RED")
     play_red()
     utime.sleep(1)
@@ -191,7 +271,7 @@ while True:
     play_blue()
     utime.sleep(1)
     
-    print("YELLOt")
+    print("YELLOW")
     play_yellow()
     utime.sleep(1)
     
@@ -203,7 +283,7 @@ while True:
     play_orange()
     utime.sleep(1)
     
-    print("PURPL")
+    print("PURPLE")
     play_purple()
     utime.sleep(1)
     

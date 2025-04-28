@@ -45,216 +45,218 @@ def play_tone(frequency, duration, duty=volume):
     buzzer.duty_u16(0)
     utime.sleep(0.05)
 
+
+
+# C is always RED
 def play_red():
     """
-    RED (#FF0000): Joyful, bright, energetic “bell chimes.”
+    RED (#FF0000): Ultra-C-centric bell fanfare—
+    constant C pulses, octave jumps, and a final triple-C flourish.
     """
-
-    # LED on
     led_red.on()
 
     melody = [
-        1000, 1200, 1400, 1600,  # up
-        1400, 1200, 1000,        # down
-        1000, 1200, 1400, 1600,  # up
-        1800, 2000, 2200         # upup
+        262, 262, 262,         
+        330, 262,               
+        392, 262,               
+
+        262, 330, 392, 523,     
+        392, 330, 262,         
+
+        262, 523, 262, 523, 262,
+
+        262, 330, 392, 523, 784, 523, 523, 523 
     ]
     durations = [
-        0.15, 0.15, 0.15, 0.15,  # up
-        0.15, 0.15, 0.15,        # down
-        0.15, 0.15, 0.15, 0.15,  # up
-        0.2, 0.2, 0.3            # upup (longer)
+        0.08, 0.08, 0.12,
+        0.10, 0.12,
+        0.10, 0.14,
+
+        0.10, 0.10, 0.10, 0.15,
+        0.10, 0.10, 0.14,
+
+        0.08, 0.08, 0.08, 0.08, 0.12,
+
+        0.08, 0.08, 0.08, 0.12, 0.15, 0.10, 0.10, 0.25
     ]
+
     for freq, dur in zip(melody, durations):
         play_tone(freq, dur)
-    
-    # LED off
+
     led_red.off()
 
+
+# D is always BLUE
 def play_blue():
     """
-    BLUE (#0000FF): Calm “ocean wave” pattern at a lower pitch.
+    BLUE (#0000FF): Gentle surf built on D—
+    slow rocking between D3, D4, and D5 with soft fifths (A) to add depth.
     """
-    # LED on
     led_blue.on()
 
-    wave_sequence = [
-        (200, 0.3), (250, 0.3), (300, 0.3), (350, 0.3),
-        (300, 0.3), (250, 0.3), (200, 0.3)
+    melody = [
+        147,  294,  220,  294,  588,  440,  294, 147,
+        147,  294,  220,  294,  588,  440,  294, 147,
+        147,  220,  294,  220,  147            
+    ]
+    durations = [
+        0.50, 0.50, 0.50, 0.50, 0.60, 0.50, 0.50, 0.60,
+        0.50, 0.50, 0.50, 0.50, 0.60, 0.50, 0.50, 0.60,
+        0.55, 0.55, 0.70, 0.55, 0.80            
     ]
 
-    for _ in range(2):
-        for freq, dur in wave_sequence:
-            play_tone(freq, dur)
-    
-    # LED off
+    for freq, dur in zip(melody, durations):
+        play_tone(freq, dur)
+
     led_blue.off()
 
+# E is always YELLOW
 def play_yellow():
     """
-    YELLOW (#FFFF00): Bright, happy “bird chirps.”
+    YELLOW (#FFFF00)
+    Ultra-E birdsong: rapid E pulses, octave-jump trills, and one
+    bright E6 flash for a burst-of-sun effect.
     """
-    # LED on
     led_yellow.on()
 
     melody = [
-        1500, 1800, 1500, 1800,  
-        2000, 1700, 2000,        # up-down
-        1500, 1800, 1500, 1800,  # up-down
-        2000, 2200, 2000         # last chirps
+        330, 330, 330,                            
+        370, 415, 370, 330,                             
+        330, 660, 1320, 660, 330,                        
+        415, 494, 554, 494, 415, 370, 330,               
+        330, 660, 330, 660, 330                        
+    ]
+
+    durations = [
+        0.06, 0.06, 0.10,
+        0.08, 0.08, 0.08, 0.12,
+        0.06, 0.10, 0.12, 0.10, 0.08,
+        0.08, 0.08, 0.10, 0.08, 0.08, 0.08, 0.12,
+        0.06, 0.10, 0.06, 0.10, 0.18
+    ]
+
+    for freq, dur in zip(melody, durations):
+        play_tone(freq, dur)
+
+    led_yellow.off()
+
+
+# F is always GREEN
+def play_green():
+    """
+    GREEN (#00FF00): Harmonious and calming F (lower octave).
+    Melodic tones with a deeper, slower, and more soothing sound to represent balance and nature.
+    """
+    led_green.on()
+
+    melody = [
+        174, 174, 174, 174, 174, 174, 174, 174, 174, 
+        220, 174, 293, 220, 174, 293, 
+        174, 196, 174, 196, 174, 174,  
+        293, 293, 220, 196, 220, 174,  
+        174, 293, 174, 293, 174, 174, 
+        196, 220, 293, 220, 196, 174   
     ]
     
     durations = [
-        0.08, 0.08, 0.08, 0.08,
-        0.1, 0.1, 0.1,
-        0.08, 0.08, 0.08, 0.08,
-        0.1, 0.1, 0.15
+        0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 0.30, 
+        0.35, 0.35, 0.35, 0.35, 0.35, 0.35, 
+        0.30, 0.35, 0.30, 0.35, 0.35, 0.35,  
+        0.30, 0.35, 0.35, 0.35, 0.35, 0.35,  
+        0.30, 0.30, 0.35, 0.35, 0.35, 0.35, 
+        0.30, 0.30, 0.30, 0.35           
     ]
+
     for freq, dur in zip(melody, durations):
         play_tone(freq, dur)
-    
-    # LED off
-    led_yellow.off()
 
-def play_green():
-    """
-    GREEN (#008000): Natural, friendly frog-like or leaf-rustling feel.
-    """
-    # LED on
-    led_green.on()
-
-    sequence_one = [
-        (400, 0.2), (450, 0.2), (400, 0.2), (350, 0.2)
-    ]
-    sequence_two = [
-        (300, 0.2), (350, 0.2), (400, 0.2), (350, 0.2)
-    ]
-    # play it twice 
-    for _ in range(2):
-        for freq, dur in sequence_one:
-            play_tone(freq, dur)
-    for _ in range(2):
-        for freq, dur in sequence_two:
-            play_tone(freq, dur)
-    
-    # LED off
     led_green.off()
 
 def play_orange():
     """
-    ORANGE (#FFA500): Warm, energetic trumpet or fanfare style.
+    ORANGE (#FFA500): Bright and energetic A note.
+    A dynamic melody that combines the sharpness of red and the brightness of yellow,
+    creating a lively and energetic sound to represent creativity and vibrance.
     """
-    # LED on
     led_orange.on()
 
-    fanfare = [
-        (800, 0.15), (1200, 0.15), (1000, 0.15),
-        (1300, 0.15), (1100, 0.15)
-    ]
-    flourish = [
-        (1400, 0.2), (1600, 0.2), (1800, 0.3)
+    melody = [
+        440, 440, 440, 440, 440, 440, 440, 440, 440,  
+        523, 440, 659, 523, 440, 659,  
+        440, 493, 440, 493, 440, 440, 
+        659, 659, 523, 493, 523, 440,  
+        440, 659, 440, 659, 440, 440, 
+        493, 523, 659, 523, 493, 440  
     ]
     
-    for _ in range(2):
-        for freq, dur in fanfare:
-            play_tone(freq, dur)
-    # end with flourish
-    for freq, dur in flourish:
+    durations = [
+        0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,  
+        0.10, 0.10, 0.10, 0.10, 0.10, 0.10,  
+        0.08, 0.10, 0.08, 0.10, 0.10, 0.10, 
+        0.08, 0.10, 0.10, 0.10, 0.10, 0.10, 
+        0.08, 0.08, 0.10, 0.10, 0.10, 0.10,  
+        0.08, 0.08, 0.08, 0.10           
+    ]
+
+    for freq, dur in zip(melody, durations):
         play_tone(freq, dur)
-    
-    # LED off
+
     led_orange.off()
-    
-def play_purple():
-    """
-    PURPLE (#800080): Magical sparkle or whimsical notes (mysterious, imaginative).
-    """
-    # LED on
-    led_purple.on()
 
-    melody = [
-        1200, 1400, 1600, 1800,  # up
-        1600, 1400, 1200,        # down
-        1400, 1600, 1800, 2000,  # up
-        1800, 1600, 2200         #  flourish
-    ]
-    durations = [
-        0.15, 0.15, 0.15, 0.15,  # up
-        0.15, 0.15, 0.15,        # down
-        0.15, 0.15, 0.15, 0.15,  # up
-        0.2, 0.2, 0.3            #  flourish
-    ]
-    for freq, dur in zip(melody, durations):
-        play_tone(freq, dur)
-    
-    # LED off
-    led_purple.off()
-
-def play_pink():
-    """
-    PINK (#FFC0CB): Light-hearted 'bubble-popping' or gentle bell sounds.
-    """
-    # LED on
-    led_pink.on()
-
-    melody = [
-        1500, 1800, 1600, 2000, 
-        2200, 1800, 1400, 1800,  
-        2000, 2200, 2400, 2100   #  flourish
-    ]
-    durations = [
-        0.08, 0.08, 0.08, 0.1,
-        0.08, 0.08, 0.08, 0.1,
-        0.08, 0.08, 0.12, 0.2
-    ]
-    for freq, dur in zip(melody, durations):
-        play_tone(freq, dur)
-    
-    # LED off
-    led_pink.off()
 
 def play_black():
     """
     BLACK (#000000): Cozy nighttime with gentle 'heartbeat' and 'cricket chirp.'
+    Darker and slower than before, evoking a deep, tranquil nighttime atmosphere.
     """
     # LED on
     led_black.on()
 
-    for _ in range(4):
-        play_tone(200, 0.2)
-        utime.sleep(0.2)
-        play_tone(1500, 0.05)
-        utime.sleep(0.3)
-    final_chirps = [1700, 1500, 1800]
+    for _ in range(5):
+        play_tone(110, 0.4)  
+        utime.sleep(0.4)    
+        play_tone(1000, 0.1) 
+        utime.sleep(0.5)     
+
+    final_chirps = [1300, 1100, 1200] 
     for freq in final_chirps:
-        play_tone(freq, 0.05)
-        utime.sleep(0.3)
+        play_tone(freq, 0.1) 
+        utime.sleep(0.6)      
 
     # LED off
     led_black.off()
 
+
 def play_white():
     """
-    WHITE (#FFFFFF): Gentle wind-chime or soft 'fairy dust' twinkle (airy, clean).
+    WHITE (#FFFFFF): Bright, pure, and harmonious.
+    A high-pitched, serene melody representing clarity, elegance, and simplicity.
     """
-    # LED on
     led_white.on()
 
     melody = [
-        1200, 1400, 1600, 1800, 2000,
-        1800, 1600, 2200, 2000, 2400,
-        2200, 2000, 1400
+        523, 587, 659, 587, 523, 
+        659, 587, 523, 659, 523, 
+        587, 523, 659, 587, 523   
     ]
+    
     durations = [
-        0.12, 0.12, 0.12, 0.15, 0.15,
-        0.15, 0.12, 0.15, 0.15, 0.2,
-        0.15, 0.12, 0.3
+        0.2, 0.2, 0.2, 0.2, 0.2,  
+        0.2, 0.2, 0.2, 0.2, 0.2,  
+        0.2, 0.2, 0.2, 0.2, 0.2   
     ]
+
     for freq, dur in zip(melody, durations):
         play_tone(freq, dur)
-    
-    # LED off
+
     led_white.off()
+
+
+
+
+
+
+
 
 #Todo: Implement NFC tag to distinguish each color
 while True:
@@ -263,37 +265,37 @@ while True:
     turn_off_all_leds()
 
     
-    print("RED")
-    play_red()
-    utime.sleep(1)
+    # print("RED")
+    # play_red()
+    # utime.sleep(1)
     
-    print("BLUE")
-    play_blue()
-    utime.sleep(1)
+    # print("BLUE")
+    # play_blue()
+    # utime.sleep(1)
     
-    print("YELLOW")
-    play_yellow()
-    utime.sleep(1)
+    # print("YELLOW")
+    # play_yellow()
+    # utime.sleep(1)
     
-    print("GREEN")
-    play_green()
-    utime.sleep(1)
+    # print("GREEN")
+    # play_green()
+    # utime.sleep(1)
     
-    print("ORANGt")
-    play_orange()
-    utime.sleep(1)
+    # print("ORANGE")
+    # play_orange()
+    # utime.sleep(1)
     
-    print("PURPLE")
-    play_purple()
-    utime.sleep(1)
+    # print("PURPLE")
+    # play_purple()
+    # utime.sleep(1)
     
-    print("PINK") 
-    play_pink()
-    utime.sleep(1)
+    # print("PINK") 
+    # play_pink()
+    # utime.sleep(1)
     
-    print("BLACK")
-    play_black()
-    utime.sleep(1)
+    # print("BLACK")
+    # play_black()
+    # utime.sleep(1)
     
     print("WHITE")
     play_white()

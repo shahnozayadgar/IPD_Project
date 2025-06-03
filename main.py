@@ -1,6 +1,10 @@
-import machine
+from machine import Pin, PWM
 import utime
 from myneopixel import Neopixel
+from mfrc522 import MFRC522
+
+#RFID reader setup
+reader = MFRC522(spi_id=0, sck=6, miso=4, mosi=7, cs=5, rst=22)
 
 buzzer_pin = machine.Pin(16)
 buzzer = machine.PWM(buzzer_pin)
@@ -293,41 +297,80 @@ def play_white():
 
     turn_off_all_pixels()
 
+#RFID tag to color/sound mapping
+tag_actions = {
+    334816739: play_red,
+    30138130: play_blue,
+    29755974: play_yellow,
+    83430365: play_green,
+    84748377: play_orange,
+    677346675: play_purple,
+}
+
+print("RFID Color & Sound System Ready!")
+print("Available colors: RED, BLUE, YELLOW, GREEN, ORANGE, PURPLE, PINK, WHITE, BLACK")
+print("Bring RFID tag closer...")
+print("")
+
 while True:
-    turn_off_all_pixels()
+    reader.init()
+    (stat, tag_type) = reader.request(reader.REQIDL)
     
-    print("RED")
-    play_red()
-    utime.sleep(1)
+    if stat == reader.OK:
+        (stat, uid) = reader.SelectTagSN()
+        if stat == reader.OK:
+            card = int.from_bytes(bytes(uid), "little", False)
+            print(f"Card ID: {card}")
+            
+            if card in tag_actions:
+                color_name = [k for k, v in globals().items() if callable(v) and v == tag_actions[card]][0].replace('play_', '').upper()
+                print(f"Playing {color_name}...")
+                tag_actions[card]() 
+                turn_off_all_pixels()
+                print("Ready for next tag...")
+            else:
+                print("Unknown card! Add this ID to tag_actions dictionary.")
+                light_color(RED)
+                play_tone(200, 0.5)  
+                turn_off_all_pixels()
     
-    print("BLUE")
-    play_blue()
-    utime.sleep(1)
+    utime.sleep(0.5)  
+
+# while True:
+#     turn_off_all_pixels()
     
-    print("YELLOW")
-    play_yellow()
-    utime.sleep(1)
+#     print("RED")
+#     play_red()
+#     utime.sleep(1)
     
-    print("GREEN")
-    play_green()
-    utime.sleep(1)
+#     print("BLUE")
+#     play_blue()
+#     utime.sleep(1)
     
-    print("ORANGE")
-    play_orange()
-    utime.sleep(1)
+#     print("YELLOW")
+#     play_yellow()
+#     utime.sleep(1)
     
-    print("PURPLE")
-    play_purple()
-    utime.sleep(1)
+#     print("GREEN")
+#     play_green()
+#     utime.sleep(1)
     
-    print("PINK") 
-    play_pink()
-    utime.sleep(1)
+#     print("ORANGE")
+#     play_orange()
+#     utime.sleep(1)
     
-    print("BLACK")
-    play_black()
-    utime.sleep(1)
+#     print("PURPLE")
+#     play_purple()
+#     utime.sleep(1)
     
-    print("WHITE")
-    play_white()
-    utime.sleep(3)
+#     print("PINK") 
+#     play_pink()
+#     utime.sleep(1)
+    
+#     print("BLACK")
+#     play_black()
+#     utime.sleep(1)
+    
+#     print("WHITE")
+#     play_white()
+#     utime.sleep(3)

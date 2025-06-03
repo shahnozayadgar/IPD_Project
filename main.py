@@ -12,6 +12,12 @@ buzzer = machine.PWM(buzzer_pin)
 pixels = Neopixel(15, 0, 17)
 pixels.brightness(100)
 
+#button setup for mode switching
+button = Pin(14, Pin.IN, Pin.PULL_DOWN)
+mode = 1  # Start in learning mode
+last_button_state = 1
+button_pressed = False
+
 RED = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
@@ -307,12 +313,121 @@ tag_actions = {
     677346675: play_purple,
 }
 
-print("RFID Color & Sound System Ready!")
-print("Available colors: RED, BLUE, YELLOW, GREEN, ORANGE, PURPLE, PINK, WHITE, BLACK")
-print("Bring RFID tag closer...")
+# For testing mode
+import urandom
+color_functions = [play_red, play_blue, play_yellow, play_green, play_orange, play_purple, play_pink, play_white, play_black]
+color_names = ["RED", "BLUE", "YELLOW", "GREEN", "ORANGE", "PURPLE", "PINK", "WHITE", "BLACK"]
+current_test_color = None
+test_function = None
+score = 0
+attempts = 0
+
+def check_button():
+    """Check for button press and handle mode switching"""
+    global mode, last_button_state, button_pressed, current_test_color, test_function, score, attempts
+    
+    current_button_state = button.value()
+    
+    # Detect button press (falling edge)
+    if last_button_state == 1 and current_button_state == 0:
+        button_pressed = True
+        
+    last_button_state = current_button_state
+    
+    if button_pressed:
+        button_pressed = False
+        mode = 2 if mode == 1 else 1  # Toggle between modes
+        
+        # Reset testing mode variables when switching
+        current_test_color = None
+        test_function = None
+        score = 0
+        attempts = 0
+        
+        turn_off_all_pixels()
+        
+        if mode == 1:
+            print("\n=== LEARNING MODE ===")
+            print("Scan any tag to see its color and hear its sound!")
+        else:
+            print("\n=== TESTING MODE ===")
+            print("Listen to the sound and scan the matching color tag!")
+            generate_test_question()
+
+def generate_test_question():
+    """Generate a random color/sound for testing"""
+    global current_test_color, test_function
+    
+    random_index = urandom.getrandbits(32) % len(color_functions)
+    test_function = color_functions[random_index]
+    current_test_color = color_names[random_index]
+    
+    print(f"\nListen to this sound and find the matching color tag:")
+    utime.sleep(1)
+    test_function()
+    print("Which color was that? Scan the corresponding tag!")
+
+def check_test_answer(scanned_card_id):
+    """Check if the scanned tag matches the test color"""
+    global score, attempts, current_test_color, test_function
+    
+    attempts += 1
+    
+    if scanned_card_id in tag_actions:
+        scanned_function = tag_actions[scanned_card_id]
+        
+        if scanned_function == test_function:
+            score += 1
+            print(f"✓ CORRECT! That was {current_test_color}!")
+            print(f"Score: {score}/{attempts}")
+            
+            # Success feedback
+            for _ in range(3):
+                light_color(GREEN)
+                play_tone(523, 0.2)  # High success tone
+                turn_off_all_pixels()
+                utime.sleep(0.1)
+            
+            utime.sleep(1)
+            generate_test_question()  # Next question
+            
+        else:
+            # Find the actual color name for the scanned tag
+            scanned_color = "UNKNOWN"
+            for name, func in zip(color_names, color_functions):
+                if func == scanned_function:
+                    scanned_color = name
+                    break
+                    
+            print(f"✗ Wrong! You scanned {scanned_color}, but the answer was {current_test_color}")
+            print(f"Score: {score}/{attempts}")
+            
+            # Error feedback
+            for _ in range(2):
+                light_color(RED)
+                play_tone(200, 0.3)  # Low error tone
+                turn_off_all_pixels()
+                utime.sleep(0.2)
+            
+            print("Try again! The sound was:")
+            utime.sleep(1)
+            test_function()  # Replay the sound
+    else:
+        print("Unknown tag! Please use a registered color tag.")
+        play_tone(150, 0.5)  # Unknown tag tone
+
+print("RFID Color & Sound Learning System Ready!")
+print("Button: Switch between Learning and Testing modes")
+print("=== LEARNING MODE ===")
+print("Scan any tag to see its color and hear its sound!")
 print("")
 
+# Main loop
 while True:
+    # Check for button press
+    check_button()
+    
+    # RFID Reading
     reader.init()
     (stat, tag_type) = reader.request(reader.REQIDL)
     
@@ -320,21 +435,64 @@ while True:
         (stat, uid) = reader.SelectTagSN()
         if stat == reader.OK:
             card = int.from_bytes(bytes(uid), "little", False)
-            print(f"Card ID: {card}")
             
-            if card in tag_actions:
-                color_name = [k for k, v in globals().items() if callable(v) and v == tag_actions[card]][0].replace('play_', '').upper()
-                print(f"Playing {color_name}...")
-                tag_actions[card]() 
-                turn_off_all_pixels()
-                print("Ready for next tag...")
-            else:
-                print("Unknown card! Add this ID to tag_actions dictionary.")
-                light_color(RED)
-                play_tone(200, 0.5)  
-                turn_off_all_pixels()
+            if mode == 1:  # Learning Mode
+                print(f"Card ID: {card}")
+                
+                if card in tag_actions:
+                    # Find color name for display
+                    color_name = "UNKNOWN"
+                    for name, func in zip(color_names, color_functions):
+                        if func == tag_actions[card]:
+                            color_name = name
+                            break
+                    
+                    print(f"Playing {color_name}...")
+                    tag_actions[card]()  # Execute the color/sound function
+                    turn_off_all_pixels()
+                    print("Scan another tag to continue learning!")
+                else:
+                    print("Unknown card! Add this ID to tag_actions dictionary.")
+                    light_color(RED)
+                    play_tone(200, 0.5)
+                    turn_off_all_pixels()
+                    
+            else:  # Testing Mode
+                if current_test_color is None:
+                    generate_test_question()
+                else:
+                    check_test_answer(card)
     
-    utime.sleep(0.5)  
+    utime.sleep(0.1)  # Small delay
+
+# print("RFID Color & Sound System Ready!")
+# print("Available colors: RED, BLUE, YELLOW, GREEN, ORANGE, PURPLE, PINK, WHITE, BLACK")
+# print("Bring RFID tag closer...")
+# print("")
+
+# while True:
+#     reader.init()
+#     (stat, tag_type) = reader.request(reader.REQIDL)
+    
+#     if stat == reader.OK:
+#         (stat, uid) = reader.SelectTagSN()
+#         if stat == reader.OK:
+#             card = int.from_bytes(bytes(uid), "little", False)
+#             print(f"Card ID: {card}")
+            
+#             if card in tag_actions:
+#                 color_name = [k for k, v in globals().items() if callable(v) and v == tag_actions[card]][0].replace('play_', '').upper()
+#                 print(f"Playing {color_name}...")
+#                 tag_actions[card]() 
+#                 turn_off_all_pixels()
+#                 print("Ready for next tag...")
+#             else:
+#                 print("Unknown card! Add this ID to tag_actions dictionary.")
+#                 light_color(RED)
+#                 play_tone(200, 0.5)  
+#                 turn_off_all_pixels()
+    
+#     utime.sleep(0.5)  
 
 # while True:
 #     turn_off_all_pixels()
